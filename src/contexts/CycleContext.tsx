@@ -1,8 +1,8 @@
-import { createContext, useState } from 'react'
+import { ReactNode, createContext, useState } from 'react'
 
 interface CreateCycleData {
-  task: string;
-  minutesAmount: number;
+  task: string
+  minutesAmount: number
 }
 
 interface Cycle {
@@ -20,13 +20,19 @@ interface CyclesContext {
   amountSecondsPassed: number
   markCurrentAsFinished: () => void
   setSecondsPassed: (seconds: number) => void
-  CreateNewCycle: ()
-  InterruptCycle
+  createNewCycle: (data: CreateCycleData) => void
+  interruptCycle: () => void
 }
 
 export const CyclesContext = createContext({} as CyclesContext)
 
-export function CyclesContextProvider() {
+interface CyclerContextProviderProps {
+  children: ReactNode
+}
+
+export function CyclesContextProvider({
+  children,
+}: CyclerContextProviderProps) {
   const [cycles, setCycles] = useState<Cycle[]>([])
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
@@ -49,7 +55,7 @@ export function CyclesContextProvider() {
     setAmountSecondsPassed(seconds)
   }
 
-  function CreateNewCycle(data: newCycleFormData) {
+  function createNewCycle(data: CreateCycleData) {
     const id = String(new Date().getTime())
 
     const newCycles: Cycle = {
@@ -62,10 +68,10 @@ export function CyclesContextProvider() {
     setCycles((state) => [...state, newCycles])
     setActiveCycleId(id)
     setAmountSecondsPassed(0)
-    reset()
+    // reset()
   }
 
-  function InterruptCycle() {
+  function interruptCycle() {
     setCycles((state) =>
       state.map((cycle) => {
         if (cycle.id === activeCycleId) {
@@ -77,7 +83,7 @@ export function CyclesContextProvider() {
     )
     setActiveCycleId(null)
   }
-  
+
   return (
     <CyclesContext.Provider
       value={{
@@ -86,7 +92,11 @@ export function CyclesContextProvider() {
         markCurrentAsFinished,
         amountSecondsPassed,
         setSecondsPassed,
+        createNewCycle,
+        interruptCycle,
       }}
-    ></CyclesContext.Provider>\
+    >
+      {children}
+    </CyclesContext.Provider>
   )
 }
