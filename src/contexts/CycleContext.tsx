@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useState } from 'react'
+import { ReactNode, createContext, useEffect, useState } from 'react'
 
 interface CreateCycleData {
   task: string
@@ -39,6 +39,11 @@ export function CyclesContextProvider({
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+
+  useEffect(() => {
+    const stateJSON = JSON.stringify(cycles)
+    localStorage.setItem('@timer:cycles', stateJSON)
+  }, [cycles])
 
   function markCurrentAsFinished() {
     setCycles((state) =>
